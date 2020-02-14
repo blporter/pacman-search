@@ -88,36 +88,34 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
+
     start = problem.getStartState()
     stack = util.Stack()
-    moves = util.Stack()
     visited = [start]
+    moves = []
 
-    starting_nodes = problem.getSuccessors(start)
-    if starting_nodes is None:
-        print("No possible moves found.")
-        return None
-    for node in reversed(starting_nodes):
+    for node in problem.getSuccessors(start):
         stack.push(node)
 
     current_node = stack.pop()
     while not problem.isGoalState(current_node[0]):
-        moves.push(current_node[1])
-
         if current_node[0] not in visited:
             visited.append(current_node[0])
+            moves.append(current_node[1])
 
-        successors = problem.getSuccessors(current_node[0])
-        if successors is None:
-            moves.pop()
-        for node in reversed(successors):
-            if node not in visited:
+            successors = problem.getSuccessors(current_node[0])
+            for node in successors:
+                if node[0] in visited:
+                    continue
                 stack.push(node)
+                moves.append(node[1])
+
+            if not successors:
+                moves.pop()
 
         current_node = stack.pop()
-    moves.push(current_node[1])
 
-    return moves.list
+    return moves
 
 
 def breadthFirstSearch(problem):
