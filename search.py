@@ -88,46 +88,36 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-
-    # Returns the first node (left-most) found, or None if all have been visited.
-    def get_next_node(nodes):
-        for node in nodes:
-            if node[0] in visited:
-                continue
-            visited.append(node[0])
-            return node
-        return None
-
     start = problem.getStartState()
     stack = util.Stack()
+    moves = util.Stack()
     visited = [start]
-    # Should never have an empty stack
-    stack.push(start)
 
-    current_node = problem.getSuccessors(start)
-    if current_node is None:
+    starting_nodes = problem.getSuccessors(start)
+    if starting_nodes is None:
         print("No possible moves found.")
         return None
+    for node in reversed(starting_nodes):
+        stack.push(node)
 
-    current_node = current_node[0]
+    current_node = stack.pop()
     while not problem.isGoalState(current_node[0]):
+        moves.push(current_node[1])
+
         if current_node[0] not in visited:
             visited.append(current_node[0])
-        next_node = get_next_node(problem.getSuccessors(current_node[0]))
-        if next_node is None:
-            current_node = stack.pop()
-            continue
-        stack.push(current_node)
-        current_node = next_node
-    stack.push(current_node)
 
-    moves = []
-    # The first item of the stack is the start, it has no move
-    stack.list.remove(stack.list[0])
-    for move in stack.list:
-        moves.append(move[1])
+        successors = problem.getSuccessors(current_node[0])
+        if successors is None:
+            moves.pop()
+        for node in reversed(successors):
+            if node not in visited:
+                stack.push(node)
 
-    return moves
+        current_node = stack.pop()
+    moves.push(current_node[1])
+
+    return moves.list
 
 
 def breadthFirstSearch(problem):
