@@ -94,6 +94,7 @@ def depthFirstSearch(problem):
     visited = [start]
     moves = []
 
+    # First node is special, has no direction; shouldn't include in loop
     for node in problem.getSuccessors(start):
         stack.push(node)
 
@@ -103,6 +104,7 @@ def depthFirstSearch(problem):
             visited.append(current_node[0])
             moves.append(current_node[1])
 
+            # Expand the state of the current node, check all the children
             successors = problem.getSuccessors(current_node[0])
             total_visited = 0
             for node in successors:
@@ -110,13 +112,15 @@ def depthFirstSearch(problem):
                     total_visited += 1
                     continue
                 stack.push(node)
-                moves.append(node[1])
 
+            # We're backtracking, pop moves
             if total_visited == len(successors):
                 moves.pop()
-
+        # Traversing the stack
         current_node = stack.pop()
 
+    # Final move to goal, outside of loop
+    moves.append(current_node[1])
     return moves
 
 
