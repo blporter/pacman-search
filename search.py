@@ -91,27 +91,28 @@ def depthFirstSearch(problem):
 
     start = problem.getStartState()
     stack = util.Stack()
-    visited_paths = util.Stack()
+    visited = util.Stack()
 
     # First node is special, has no direction; shouldn't include in loop
     for node in problem.getSuccessors(start):
         stack.push(node)
-        visited_paths.push([node])
+        visited.push([node])
+
     current_node = stack.pop()
-    current_path = visited_paths.pop()
+    current_path = visited.pop()
     while not problem.isGoalState(current_node[0]):
         # Expand the state of the current node, check all the children
         successors = problem.getSuccessors(current_node[0])
         for node in successors:
-            if any(elem[0] == node[0] for elem in current_path):
+            if any(path[0] == node[0] for path in current_path):
                 continue
-            else:
-                visited_paths.push(current_path + [node])
-                stack.push(node)
-        current_path = visited_paths.pop()
+            visited.push(current_path + [node])
+            stack.push(node)
+
+        current_path = visited.pop()
         current_node = stack.pop()
-    # Final move to goal, outside of loop
-    return [x[1] for x in current_path]
+
+    return [path[1] for path in current_path]
 
 
 def breadthFirstSearch(problem):
