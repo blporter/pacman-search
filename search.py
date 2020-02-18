@@ -74,6 +74,37 @@ def tinyMazeSearch(problem):
     return [s, s, w, s, w, w, s, w]
 
 
+def generic_search_method(problem, data, path, heuristic=None):
+    current_node = data.pop()
+    visited = []
+    final_path = []
+
+    while not problem.isGoalState(current_node):
+        # Skip visited nodes, don't expand them
+        if current_node not in visited:
+            visited.append(current_node)
+
+            # Expand the state of the current node, check all the children
+            successors = problem.getSuccessors(current_node)
+            for node in successors:
+                current_path = final_path + [node[1]]
+                # Check if movement cost should be taken into consideration
+                if data.__class__ == util.PriorityQueue:
+                    cost = problem.getCostOfActions(current_path)
+                    if heuristic:
+                        cost += heuristic(node[0], problem)
+                    path.push(current_path, cost)
+                    data.push(node[0], cost)
+                else:
+                    path.push(current_path)
+                    data.push(node[0])
+
+        final_path = path.pop()
+        current_node = data.pop()
+
+    return final_path
+
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -91,40 +122,38 @@ def depthFirstSearch(problem):
 
     start = problem.getStartState()
     stack = util.Stack()
-    visited = util.Stack()
+    path = util.Stack()
 
-    # First node is special, has no direction; shouldn't include in loop
-    for node in problem.getSuccessors(start):
-        stack.push(node)
-        visited.push([node])
+    stack.push(start)
 
-    current_node = stack.pop()
-    current_path = visited.pop()
-    while not problem.isGoalState(current_node[0]):
-        # Expand the state of the current node, check all the children
-        successors = problem.getSuccessors(current_node[0])
-        for node in successors:
-            if any(path[0] == node[0] for path in current_path):
-                continue
-            visited.push(current_path + [node])
-            stack.push(node)
-
-        current_path = visited.pop()
-        current_node = stack.pop()
-
-    return [path[1] for path in current_path]
+    final_path = generic_search_method(problem, stack, path)
+    return final_path
 
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    start = problem.getStartState()
+    queue = util.Queue()
+    path = util.Queue()
+
+    queue.push(start)
+
+    final_path = generic_search_method(problem, queue, path)
+    return final_path
 
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    start = problem.getStartState()
+    priority_queue = util.PriorityQueue()
+    path = util.PriorityQueue()
+
+    priority_queue.push(start, 0)
+
+    final_path = generic_search_method(problem, priority_queue, path)
+    return final_path
 
 
 def nullHeuristic(state, problem=None):
@@ -137,8 +166,15 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    start = problem.getStartState()
+    priority_queue = util.PriorityQueue()
+    path = util.PriorityQueue()
+
+    priority_queue.push(start, 0)
+
+    final_path = generic_search_method(problem, priority_queue, path, heuristic)
+    return final_path
 
 
 # Abbreviations
