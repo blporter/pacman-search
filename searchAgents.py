@@ -298,7 +298,7 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        # Nothing needs to be added here.
+        self.startingGameState = startingGameState
 
     def getStartState(self):
         """
@@ -313,17 +313,8 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
 
-        # Arbitrary variables for readability
-        node = state[0]
-        found_corners = state[1]
-
-        if node in self.corners:
-            # If currently at a corner, append it to the list of found corners
-            if node not in found_corners:
-                found_corners.append(node)
-
-        # If all four have been found, then goal is met
-        return len(found_corners) == 4
+        # If all four corners have been found, then the goal requirement is met.
+        return len(state[1]) == 4
 
     def getSuccessors(self, state):
         """
@@ -353,8 +344,9 @@ class CornersProblem(search.SearchProblem):
             hits_wall = self.walls[next_x][next_y]
 
             if not hits_wall:
-                # Arbitrary variables for readability, mostly
+                # Arbitrary variables for readability, mostly.
                 next_node = (next_x, next_y)
+                # The found corners list does need to be updated in the loop; it may change.
                 found_corners = list(state[1])
 
                 # If the next node is a corner and not already found, we need to visit it.
@@ -395,11 +387,20 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-    corners = problem.corners  # These are the corner coordinates
-    walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
 
-    "*** YOUR CODE HERE ***"
-    return 0  # Default to trivial solution
+    found_corners = list(state[1])
+    lower_bound = 0
+
+    for corner in problem.corners:
+        if corner not in found_corners:
+            # Get the "cost" by distance to each corner not yet found.
+            distance = mazeDistance(state[0], corner, problem.startingGameState)
+
+            # Update the lower bound with the new distance "cost", if needed.
+            if distance > lower_bound:
+                lower_bound = distance
+
+    return lower_bound
 
 
 class AStarCornersAgent(SearchAgent):
