@@ -297,7 +297,8 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0  # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-        "*** YOUR CODE HERE ***"
+
+        # Required for Heuristic problems
         self.startingGameState = startingGameState
 
     def getStartState(self):
@@ -388,12 +389,13 @@ def cornersHeuristic(state, problem):
     admissible (as well as consistent).
     """
 
-    found_corners = list(state[1])
     lower_bound = 0
 
+    # Get the "cost" by distance to each corner not yet found.
     for corner in problem.corners:
-        if corner not in found_corners:
-            # Get the "cost" by distance to each corner not yet found.
+        if corner not in list(state[1]):
+            # The supplied mazeDistance function takes more time for the autograder to compute, but causes
+            #   fewer node expansions than Manhattan or Euclidean.
             distance = mazeDistance(state[0], corner, problem.startingGameState)
 
             # Update the lower bound with the new distance "cost", if needed.
@@ -500,8 +502,19 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    lower_bound = 0
+
+    # Get the "cost" by distance to each node of food in the grid.
+    for food in foodGrid.asList():
+        # The supplied mazeDistance function takes more time for the autograder to compute, but causes
+        #   fewer node expansions than Manhattan or Euclidean.
+        distance = mazeDistance(position, food, problem.startingGameState)
+
+        # Update the lower bound with the new distance "cost", if needed.
+        if distance > lower_bound:
+            lower_bound = distance
+
+    return lower_bound
 
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -533,8 +546,8 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Since we're returning a path to the closest dot, we can reuse the functions written in search.py
+        return search.bfs(problem)
 
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -568,10 +581,10 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         The state is Pacman's position. Fill this in with a goal test that will
         complete the problem definition.
         """
-        x, y = state
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # We're looking for the closest food dot, so each food dot should be considered a "goal"
+        #   If the current position is in the food list, then it is a goal state.
+        return state in self.food.asList()
 
 
 def mazeDistance(point1, point2, gameState):
