@@ -394,10 +394,9 @@ def cornersHeuristic(state, problem):
     # Get the "cost" by distance to each corner not yet found.
     for corner in problem.corners:
         if corner not in list(state[1]):
-            # The supplied manhattanHeuristic function requires a problem.goal, which is not set.
-            #   In this case, the goals are each corner.
-            problem.goal = corner
-            distance = manhattanHeuristic(state[0], problem)
+            # The supplied mazeDistance function takes more time for the autograder to compute, but causes
+            #   fewer node expansions than Manhattan or Euclidean.
+            distance = mazeDistance(state[0], corner, problem.startingGameState)
 
             # Update the lower bound with the new distance "cost", if needed.
             if distance > lower_bound:
@@ -507,10 +506,9 @@ def foodHeuristic(state, problem):
 
     # Get the "cost" by distance to each node of food in the grid.
     for food in foodGrid.asList():
-        # The supplied manhattanHeuristic function requires a problem.goal, which is not set.
-        #   In this case, the goal is each food item.
-        problem.goal = food
-        distance = manhattanHeuristic(position, problem)
+        # The supplied mazeDistance function takes more time for the autograder to compute, but causes
+        #   fewer node expansions than Manhattan or Euclidean.
+        distance = mazeDistance(position, food, problem.startingGameState)
 
         # Update the lower bound with the new distance "cost", if needed.
         if distance > lower_bound:
